@@ -10,11 +10,11 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.all_ratings
     @ratings_to_show_hash = ratings_to_show_hash
     @movies = Movie.with_ratings(@ratings_to_show_hash)
-    if @ratings_to_show_hash.empty?
-      @movies = Movie.with_ratings(@all_ratings)
-    else
-      Movie.with_ratings(@ratings_to_show_hash)
-    end
+    @ratings_to_show_hash.empty? ? @movies = Movie.with_ratings(@all_ratings) : Movie.with_ratings(@ratings_to_show_hash)
+
+    @movies = @movies.order(params[:sort_by]) if params[:sort_by]
+    @title_hilite = 'hilite bg-warning' if params[:sort_by] == 'title'
+    @release_date_hilite = 'hilite bg-warning' if params[:sort_by] == 'release_date'
   end
 
   def new

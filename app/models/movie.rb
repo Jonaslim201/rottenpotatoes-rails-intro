@@ -4,11 +4,7 @@ class Movie < ActiveRecord::Base
   end
 
   def self.with_ratings(ratings_list)
-    if ratings_list.present?
-      where(rating: ratings_list)
-    else
-      all
-    end
+    ratings_list.present? ? where(rating: ratings_list) : all
   end
 
 end
