@@ -7,7 +7,14 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    @all_ratings = Movie.all_ratings
+    @ratings_to_show_hash = ratings_to_show_hash
+    @movies = Movie.with_ratings(@ratings_to_show_hash)
+    if @ratings_to_show_hash.empty?
+      @movies = Movie.with_ratings(@all_ratings)
+    else
+      Movie.with_ratings(@ratings_to_show_hash)
+    end
   end
 
   def new
@@ -29,6 +36,14 @@ class MoviesController < ApplicationController
     @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
     redirect_to movie_path(@movie)
+  end
+
+  def ratings_to_show_hash
+    if params[:ratings].present?
+      params[:ratings].keys
+    else
+      {}
+    end
   end
 
   def destroy
