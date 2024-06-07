@@ -43,7 +43,6 @@ class MoviesController < ApplicationController
   end
 
   def ratings_to_show_hash
-    Rails.logger.debug(params[:ratings])
     session[:ratings] = params[:ratings]
     if params[:ratings].present?
       params[:ratings].keys
@@ -60,8 +59,6 @@ class MoviesController < ApplicationController
   end
 
   def get_session_params
-    Rails.logger.debug(params[:ratings])
-    Rails.logger.debug(params[:ratings].nil?)
     params[:sort_by] ||= session[:sort_by] if session[:sort_by]
     if params[:refreshed].nil?
       params[:ratings] ||= session[:ratings] if session[:ratings]
