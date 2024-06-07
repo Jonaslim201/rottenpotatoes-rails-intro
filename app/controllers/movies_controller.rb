@@ -1,4 +1,5 @@
 class MoviesController < ApplicationController
+  before_action :get_session_params, only: [:index]
 
   def show
     id = params[:id] # retrieve movie ID from URI route
@@ -12,9 +13,12 @@ class MoviesController < ApplicationController
     @movies = Movie.with_ratings(@ratings_to_show_hash)
     @ratings_to_show_hash.empty? ? @movies = Movie.with_ratings(@all_ratings) : Movie.with_ratings(@ratings_to_show_hash)
 
-    @movies = @movies.order(params[:sort_by]) if params[:sort_by]
-    @title_hilite = 'hilite bg-warning' if params[:sort_by] == 'title'
-    @release_date_hilite = 'hilite bg-warning' if params[:sort_by] == 'release_date'
+    sort_by = params[:sort_by]
+    session[:sort_by] = params[:sort_by]
+    
+    @movies = @movies.order(sort_by) if sort_by
+    @title_hilite = "hilite bg-warning" if sort_by == "title"
+    @release_date_hilite = "hilite bg-warning" if sort_by == "release_date"
   end
 
   def new
@@ -39,6 +43,8 @@ class MoviesController < ApplicationController
   end
 
   def ratings_to_show_hash
+    Rails.logger.debug(params[:ratings])
+    session[:ratings] = params[:ratings]
     if params[:ratings].present?
       params[:ratings].keys
     else
@@ -51,6 +57,16 @@ class MoviesController < ApplicationController
     @movie.destroy
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
+  end
+
+  def get_session_params
+    Rails.logger.debug(params[:ratings])
+    Rails.logger.debug(params[:ratings].nil?)
+    params[:sort_by] ||= session[:sort_by] if session[:sort_by]
+    if params[:refreshed].nil?
+      params[:ratings] ||= session[:ratings] if session[:ratings]
+    end
+  
   end
 
   private
